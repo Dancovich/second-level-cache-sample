@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+	<persistence-unit name="bookmark-ds" transaction-type="JTA">
+		<jta-data-source>java:jboss/datasources/postgres</jta-data-source>
+		
+		<class>br.gov.frameworkdemoiselle.samples.second_level_cache_sample.domain.Bookmark</class>
+		
+		<!-- Determina como habilitar o cache em cada entidade.
+		Usando ENABLE_SELECTIVE, apenas as entidades anotadas com @Cacheable(true) serão postas em cache. -->
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+
+		<properties>
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+			
+			<!-- As configurações abaixo ativam o cache de segundo nível -->
+			
+			<!-- Ativa o cache de segundo nível para entidades anotadas com @Cacheable -->
+			<property name="hibernate.cache.use_second_level_cache" value="true"/>
+			
+			<!-- Ativa o cache de segundo nível para queries, mesmo assim cada query deve ter o cache ativado individualmente -->
+			<property name="hibernate.cache.use_query_cache" value="true"/>
+			
+			<!-- Define nosso provider de cache de 2º nível -->
+			<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory"/>
+			
+			<!-- Nossa estratégia de concorrência. Com read-write invalidamos o cache 
+			quando a entidade for alterada na base. Com read-only assumimos que a entidade não vai ser alterada. -->
+			<property name="hibernate.cache.default_cache_concurrency_strategy" value="read-write"/>
+			
+			<!-- Ativa a coleta de estatísticas, para verificarmos o funcionamento do cache. Em produção desligue essa opção  -->
+			<property name="hibernate.generate_statistics" value="true"/>
+		</properties>
+	</persistence-unit>
+
+
+</persistence>
