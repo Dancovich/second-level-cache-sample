@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 
 	<persistence-unit name="bookmark-ds" transaction-type="JTA">
-		<jta-data-source>java:jboss/datasources/postgres</jta-data-source>
+		<jta-data-source>java:/DefaultDS</jta-data-source>
 		
 		<class>br.gov.frameworkdemoiselle.samples.second_level_cache_sample.domain.Bookmark</class>
 		
@@ -15,7 +15,12 @@
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-			<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />
+			
+			<!-- Informar hibernate sobre o JTA no Jboss 6.1.0 -->
+			<property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.JBossTransactionManagerLookup" />
+			
+			<!-- Informar hibernate sobre o JTA no Jboss 7.1.1 -->
+			<!--<property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform" />-->
 			
 			<!-- As configurações abaixo ativam o cache de segundo nível -->
 			
@@ -25,8 +30,11 @@
 			<!-- Ativa o cache de segundo nível para queries, mesmo assim cada query deve ter o cache ativado individualmente -->
 			<property name="hibernate.cache.use_query_cache" value="true"/>
 			
-			<!-- Define nosso provider de cache de 2º nível -->
-			<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory"/>
+			<!-- Define nosso provider de cache de 2º nível no Jboss 6.1.0 -->
+			<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.SingletonEhCacheRegionFactory"/>
+
+			<!-- Define nosso provider de cache de 2º nível no Jboss 7.1.1 -->
+			<!--<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory"/>-->
 			
 			<!-- Nossa estratégia de concorrência. Com read-write invalidamos o cache 
 			quando a entidade for alterada na base. Com read-only assumimos que a entidade não vai ser alterada. -->
